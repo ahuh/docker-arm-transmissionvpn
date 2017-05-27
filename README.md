@@ -45,7 +45,15 @@ $ docker-run.sh transmission ahuh/transmission-openvpn
 (set parameters in `docker-run.sh` before launch, and generate a `docker-params.sh` to store secret OpenVPN parameters, as described in `docker-run.sh`)
 
 ### Configure Transmission
-The container will automatically create sub-directories and configuration files in torrents data dir (if empty before).
+The container will use torrents data sub-directories to configure permissions and add configuration files (if empty before).<br />
+<br />
+You have to create these directories with the PUID/PGID user permissions, before launching the container:
+```
+/data/completed
+/data/incomplete
+/data/watch
+/data/transmission-home
+```
 
 ## HOW-TOs
 
