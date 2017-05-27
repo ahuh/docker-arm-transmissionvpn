@@ -1,9 +1,9 @@
 # Transmission and OpenVPN
 #
-# Version 1.10
+# Version 1.0
 
-FROM resin/rpi-raspbian:jessie
-MAINTAINER Kristian Haugene
+FROM resin/rpi-raspbian:stretch
+MAINTAINER ahuh
 
 VOLUME /data
 VOLUME /config
@@ -11,19 +11,20 @@ VOLUME /config
 # Update packages and install software
 RUN apt-get update \
     && apt-get install -y transmission-cli transmission-common transmission-daemon \
-    && apt-get install -y openvpn curl \
-    && curl -sLO https://archive.raspbian.org/raspbian/pool/main/d/dumb-init/dumb-init_1.0.3-1_armhf.deb \
-    && dpkg -i dumb-init_*.deb \
-    && rm -rf dumb-init_*.deb \
+    && apt-get install -y openvpn curl nano \
+    && apt-get install -y dumb-init \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && curl -L https://github.com/jwilder/dockerize/releases/download/v0.2.0/dockerize-linux-armhf-v0.2.0.tar.gz | tar -C /usr/local/bin -xzv \
     && groupmod -g 1000 users \
     && useradd -u 911 -U -d /config -s /bin/false abc \
     && usermod -G users abc
 
 # Add configuration and scripts
-ADD openvpn/ /etc/openvpn/
-ADD transmission/ /etc/transmission/
+COPY openvpn/ /etc/openvpn/
+COPY transmission/ /etc/transmission/
+
+# Fix execution permissions after copy 
+RUN chmod +x /etc/openvpn/*.sh \
+    && chmod +x /etc/transmission/*.sh
 
 ENV OPENVPN_USERNAME=**None** \
     OPENVPN_PASSWORD=**None** \
@@ -105,4 +106,6 @@ ENV OPENVPN_USERNAME=**None** \
 
 # Expose port and run
 EXPOSE 9091
+
+# Launch OpenVPN with transmission at container start
 CMD ["dumb-init", "/etc/openvpn/start.sh"]
