@@ -122,7 +122,7 @@ ENV OPENVPN_USERNAME=**None** \
     PUID=\
     PGID=
 
-# Expose port and run
+# Expose port
 EXPOSE 9091
 
 # Launch OpenVPN with transmission at container start
