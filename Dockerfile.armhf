@@ -19,7 +19,7 @@ RUN rm -rf /etc/apt/preferences.d* \
 	&& rm -rf /etc/apt/sources.list* \
 	&& mkdir /etc/apt/sources.list.d
 	
-# Add custom bashrc to root (color in bash, ll aliases)
+# Add custom bashrc to root (ll aliases)
 ADD root/ /root/
 # Add apt config for jessie (stable) and stretch (testing) repos
 ADD preferences.d/ /etc/apt/preferences.d/
