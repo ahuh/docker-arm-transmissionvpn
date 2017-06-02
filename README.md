@@ -5,7 +5,7 @@ This project is fork from an existing project, modified to work on ARMv7 WD My C
 See forked GitHub repository: https://github.com/haugene/docker-transmission-openvpn<br />
 <br />
 This image is part of a Docker images collection, intended to build a full-featured seedbox.<br />
-This image is compatible with WD My Cloud EX2 Ultra NAS.<br />
+This image is compatible with WD My Cloud EX2 Ultra NAS (Docker v1.7.0).<br />
 
 ## Installation
 
@@ -24,25 +24,22 @@ The container will run impersonated as this user, in order to have read/write ac
 ### Run container in background
 ```
 $ docker run --name transmission --restart=always -d \
-              -p <webui port>:9091 --cap-add=NET_ADMIN \
-              --device=<tunnel network interface> \
-              -v <path to torrent dir to scan>:/watchdir \
-              -v <path to completed dir>:/downloaddir \
-              -v <path to incompleted dir>:/incompletedir \
-              -v <path to transmission home dir>:/transmissionhome \
-              -v /etc/localtime:/etc/localtime:ro \
-              -e "OPENVPN_PROVIDER=<openvpn provider>" \
-              -e "OPENVPN_CONFIG=<openvpn configuration>" \
-              -e "OPENVPN_USERNAME=<openvpn user name>" \
-              -e "OPENVPN_PASSWORD=<openvpn password> \
-              -e "TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=<enable webui authentication>" \
-              -e "TRANSMISSION_RPC_USERNAME=<webui login>" \
-              -e "TRANSMISSION_RPC_PASSWORD=<webui password>" \
-              -e "OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60" \
-              -e "LOCAL_NETWORK=<local network ip/mask>" \
-              -e "PUID=<user uid>" \
-              -e "PGID=<user gid>" \
-              ahuh/arm-transmissionvpn
+		-p <webui port>:9091 --cap-add=NET_ADMIN \
+		--device=<tunnel network interface> \
+		-v <path to torrent dir to scan>:/watchdir \
+		-v <path to completed dir>:/downloaddir \
+		-v <path to incompleted dir>:/incompletedir \
+		-v <path to transmission home dir>:/transmissionhome \
+		-v /etc/localtime:/etc/localtime:ro \
+		-e "OPENVPN_PROVIDER=<openvpn provider>" \
+		-e "OPENVPN_CONFIG=<openvpn configuration>" \
+		-e "OPENVPN_USERNAME=<openvpn user name>" \
+		-e "OPENVPN_PASSWORD=<openvpn password> \
+		-e "OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60" \
+		-e "LOCAL_NETWORK=<local network ip/mask>" \
+		-e "PUID=<user uid>" \
+		-e "PGID=<user gid>" \
+		ahuh/arm-transmissionvpn
 ```
 or
 ```
