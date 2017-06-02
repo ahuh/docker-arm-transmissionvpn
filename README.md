@@ -1,8 +1,8 @@
-# Docker Transmission with OpenVPN
-Docker image hosting a Transmission torrent client with WebUI while connecting to OpenVPN.<br />
+# Docker ARM Transmission VPN
+Docker image dedicated to ARMv7 processors, hosting a Transmission torrent client with WebUI while connecting to OpenVPN.<br />
 <br />
 This project is fork from an existing project, modified to work on ARMv7 WD My Cloud EX2 Ultra NAS.<br />
-See forked GitHub repository: https://hub.docker.com/r/haugene/transmission-openvpn<br />
+See forked GitHub repository: https://github.com/haugene/docker-transmission-openvpn<br />
 <br />
 This image is part of a Docker images collection, intended to build a full-featured seedbox.<br />
 This image is compatible with WD My Cloud EX2 Ultra NAS.<br />
@@ -24,36 +24,46 @@ The container will run impersonated as this user, in order to have read/write ac
 ### Run container in background
 ```
 $ docker run --name transmission --restart=always -d \
-              -p ${P_PORT}:9091 --cap-add=NET_ADMIN \
+              -p <webui port>:9091 --cap-add=NET_ADMIN \
               --device=<tunnel network interface> \
-              -v <path to torrents data dir>:/data \
+              -v <path to torrent dir to scan>:/watchdir \
+              -v <path to completed dir>:/downloaddir \
+              -v <path to incompleted dir>:/incompletedir \
+              -v <path to transmission home dir>:/transmissionhome \
               -v /etc/localtime:/etc/localtime:ro \
               -e "OPENVPN_PROVIDER=<openvpn provider>" \
               -e "OPENVPN_CONFIG=<openvpn configuration>" \
               -e "OPENVPN_USERNAME=<openvpn user name>" \
               -e "OPENVPN_PASSWORD=<openvpn password> \
+              -e "TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=<enable webui authentication>" \
+              -e "TRANSMISSION_RPC_USERNAME=<webui login>" \
+              -e "TRANSMISSION_RPC_PASSWORD=<webui password>" \
               -e "OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60" \
               -e "LOCAL_NETWORK=<local network ip/mask>" \
               -e "PUID=<user uid>" \
               -e "PGID=<user gid>" \
-              ahuh/transmission-openvpn
+              ahuh/arm-transmissionvpn
 ```
 or
 ```
-$ docker-run.sh transmission ahuh/transmission-openvpn
+$ ./docker-run.sh transmission ahuh/arm-transmissionvpn
 ```
 (set parameters in `docker-run.sh` before launch, and generate a `docker-params.sh` to store secret OpenVPN parameters, as described in `docker-run.sh`)
 
 ### Configure Transmission
-The container will use torrents data sub-directories to configure permissions and add configuration files (if empty before).<br />
+The container will use volumes directories to store torrent files, downloaded files, and configuration files.<br />
 <br />
-You have to create these directories with the PUID/PGID user permissions, before launching the container:
+You have to create these volume directories with the PUID/PGID user permissions, before launching the container:
 ```
-/data/completed
-/data/incomplete
-/data/watch
-/data/transmission-home
+/watchdir
+/downloaddir
+/incompletedir
+/transmissionhome
 ```
+
+The container will automatically create a `settings.json` file in the transmission home dir.<br />
+* WARNING : the `settings.json` file will be overwritten automatically at each start. Do not modify it: change parameters in `docker-run.sh` and `docker-params.sh` instead, and recreate the container.
+* With PIA VPN, the transmission connection port will be automatically changed at launch if port forwarding is available.
 
 ## HOW-TOs
 
@@ -64,14 +74,14 @@ $ docker exec -it transmission /bin/bash
 ```
 or
 ```
-$ docker-bash.sh transmission
+$ ./docker-bash.sh transmission
 ```
 
 ### Build image
 ```
-$ docker build -f Dockerfile.armhf -t transmission-openvpn .
+$ docker build -t arm-transmissionvpn .
 ```
 or
 ```
-$ docker-build.sh transmission-openvpn
+$ ./docker-build.sh arm-transmissionvpn
 ```

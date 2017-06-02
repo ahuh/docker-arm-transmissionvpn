@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# Import template function
+. /etc/common/template.sh
+
 vpn_provider="$(echo $OPENVPN_PROVIDER | tr '[A-Z]' '[a-z]')"
 vpn_provider_configs="/etc/openvpn/$vpn_provider"
 if [ ! -d "$vpn_provider_configs" ]; then
@@ -42,9 +46,8 @@ echo $TRANSMISSION_RPC_USERNAME > /config/transmission-credentials.txt
 echo $TRANSMISSION_RPC_PASSWORD >> /config/transmission-credentials.txt
 
 # Persist transmission settings for use by transmission-daemon
-chmod 777 /etc/transmission/environment-variables.tmpl.sh
-/etc/transmission/environment-variables.tmpl.sh > /etc/transmission/environment-variables.sh
-
+template /etc/transmission/environment-variables.sh.tmpl > /etc/transmission/environment-variables.sh
+chmod +x /etc/transmission/environment-variables.sh
 
 TRANSMISSION_CONTROL_OPTS="--script-security 2 --up /etc/transmission/start.sh --down /etc/transmission/stop.sh"
 

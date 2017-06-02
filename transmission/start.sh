@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Import template function
+. /etc/common/template.sh
+
 # Source our persisted env variables from container startup
 . /etc/transmission/environment-variables.sh
 
@@ -9,12 +12,9 @@ echo "Updating TRANSMISSION_BIND_ADDRESS_IPV4 to the ip of $1 : $4"
 export TRANSMISSION_BIND_ADDRESS_IPV4=$4
 
 echo "Generating transmission settings.json from env variables"
-# Ensure TRANSMISSION_HOME is created
-mkdir -p ${TRANSMISSION_HOME}
-chmod 777 /etc/transmission/settings.tmpl.sh
-/etc/transmission/settings.tmpl.sh > ${TRANSMISSION_HOME}/settings.json
-
-
+# Ensure TRANSMISSION_HOME and sub folder logs are created
+mkdir -p ${TRANSMISSION_HOME}/logs
+template settings.json.tmpl > ${TRANSMISSION_HOME}/settings.json
 
 if [ ! -e "/dev/random" ]; then
   # Avoid "Fatal: no entropy gathering module detected" error
@@ -25,7 +25,7 @@ fi
 . /etc/transmission/userSetup.sh
 
 echo "STARTING TRANSMISSION"
-exec sudo -u ${RUN_AS} /usr/bin/transmission-daemon -g ${TRANSMISSION_HOME} --logfile ${TRANSMISSION_HOME}/transmission.log &
+exec sudo -u ${RUN_AS} /usr/bin/transmission-daemon -g ${TRANSMISSION_HOME} --logfile ${TRANSMISSION_HOME}/logs/transmission.log &
 
 if [ "$OPENVPN_PROVIDER" = "PIA" ]
 then

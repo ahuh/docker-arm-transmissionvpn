@@ -10,9 +10,10 @@ if [ -n "$PUID" ] && [ ! "$(id -u root)" -eq "$PUID" ]; then
     if [ ! "$(id -g ${RUN_AS})" -eq "$PGID" ]; then groupmod -o -g "$PGID" ${RUN_AS} ; fi
 
     echo "Setting owner for transmission paths to ${PUID}:${PGID}"
-    chown -R ${RUN_AS}:${RUN_AS} ${TRANSMISSION_HOME}
-    chown ${RUN_AS}:${RUN_AS} \
-        /config \
+    chown -R ${RUN_AS}:${RUN_AS} \
+    	/config \
+    	${TRANSMISSION_HOME} \
+    	${TRANSMISSION_HOME}/logs \        
         ${TRANSMISSION_DOWNLOAD_DIR} \
         ${TRANSMISSION_INCOMPLETE_DIR} \
         ${TRANSMISSION_WATCH_DIR}

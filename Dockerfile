@@ -1,33 +1,27 @@
 # Transmission and OpenVPN
 #
-# Version 1.15
+# Version 1.0
 
-FROM ubuntu:14.04
-MAINTAINER Kristian Haugene
+FROM resin/rpi-raspbian:jessie
+MAINTAINER maintainer "ahuh"
 
-VOLUME /data
+# Volume watchdir: use it in transmission configuration for torrents to scan
+# WARNING: must have read/write accept for execution user (PUID/PGID)
+VOLUME /watchdir
+# Volume downloaddir: use it in transmission configuration for completed dir
+# WARNING: must have read/write accept for execution user (PUID/PGID)
+VOLUME /downloaddir
+# Volume incompletedir: use it in transmission configuration for incomplete dir
+# WARNING: must have read/write accept for execution user (PUID/PGID)
+VOLUME /incompletedir
+# Volume config: transmission home directory (generated at first start if needed)
+# WARNING: must have read/write accept for execution user (PUID/PGID)
+VOLUME /transmissionhome
+# Volume userhome: home directory for execution user
 VOLUME /config
 
-# Update packages and install software
-RUN apt-get update \
-    && apt-get -y install software-properties-common \
-    && add-apt-repository multiverse \
-    && add-apt-repository ppa:transmissionbt/ppa \
-    && apt-get update \
-    && apt-get install -y transmission-cli transmission-common transmission-daemon \
-    && apt-get install -y openvpn curl rar unrar zip unzip wget \
-    && curl -sLO https://github.com/Yelp/dumb-init/releases/download/v1.0.1/dumb-init_1.0.1_amd64.deb \
-    && dpkg -i dumb-init_*.deb \
-    && rm -rf dumb-init_*.deb \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && curl -L https://github.com/jwilder/dockerize/releases/download/v0.0.2/dockerize-linux-amd64-v0.0.2.tar.gz | tar -C /usr/local/bin -xzv \
-    && groupmod -g 1000 users \
-    && useradd -u 911 -U -d /config -s /bin/false abc \
-    && usermod -G users abc
-
-ADD openvpn/ /etc/openvpn/
-ADD transmission/ /etc/transmission/
-
+# Set environment variables
+# - Set OpenVPN IDs (must be overloaded), all Transmission parameters, and execution user (PUID/PGID)
 ENV OPENVPN_USERNAME=**None** \
     OPENVPN_PASSWORD=**None** \
     OPENVPN_PROVIDER=**None** \
@@ -44,23 +38,20 @@ ENV OPENVPN_USERNAME=**None** \
     "TRANSMISSION_BLOCKLIST_URL=http://www.example.com/blocklist" \
     "TRANSMISSION_CACHE_SIZE_MB=4" \
     "TRANSMISSION_DHT_ENABLED=true" \
-    "TRANSMISSION_DOWNLOAD_DIR=/data/completed" \
-    "TRANSMISSION_DOWNLOAD_LIMIT=100" \
-    "TRANSMISSION_DOWNLOAD_LIMIT_ENABLED=0" \
+    "TRANSMISSION_DOWNLOAD_DIR=/downloaddir" \
     "TRANSMISSION_DOWNLOAD_QUEUE_ENABLED=true" \
-    "TRANSMISSION_DOWNLOAD_QUEUE_SIZE=5" \
+    "TRANSMISSION_DOWNLOAD_QUEUE_SIZE=50" \
     "TRANSMISSION_ENCRYPTION=1" \
     "TRANSMISSION_IDLE_SEEDING_LIMIT=30" \
     "TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED=false" \
-    "TRANSMISSION_INCOMPLETE_DIR=/data/incomplete" \
+    "TRANSMISSION_INCOMPLETE_DIR=/incompletedir" \
     "TRANSMISSION_INCOMPLETE_DIR_ENABLED=true" \
-    "TRANSMISSION_LPD_ENABLED=false" \
-    "TRANSMISSION_MAX_PEERS_GLOBAL=200" \
+    "TRANSMISSION_LPD_ENABLED=true" \
     "TRANSMISSION_MESSAGE_LEVEL=2" \
     "TRANSMISSION_PEER_CONGESTION_ALGORITHM=" \
     "TRANSMISSION_PEER_ID_TTL_HOURS=6" \
-    "TRANSMISSION_PEER_LIMIT_GLOBAL=200" \
-    "TRANSMISSION_PEER_LIMIT_PER_TORRENT=50" \
+    "TRANSMISSION_PEER_LIMIT_GLOBAL=500" \
+    "TRANSMISSION_PEER_LIMIT_PER_TORRENT=70" \
     "TRANSMISSION_PEER_PORT=51413" \
     "TRANSMISSION_PEER_PORT_RANDOM_HIGH=65535" \
     "TRANSMISSION_PEER_PORT_RANDOM_LOW=49152" \
@@ -70,7 +61,7 @@ ENV OPENVPN_USERNAME=**None** \
     "TRANSMISSION_PORT_FORWARDING_ENABLED=false" \
     "TRANSMISSION_PREALLOCATION=1" \
     "TRANSMISSION_PREFETCH_ENABLED=1" \
-    "TRANSMISSION_QUEUE_STALLED_ENABLED=true" \
+    "TRANSMISSION_QUEUE_STALLED_ENABLED=false" \
     "TRANSMISSION_QUEUE_STALLED_MINUTES=30" \
     "TRANSMISSION_RATIO_LIMIT=2" \
     "TRANSMISSION_RATIO_LIMIT_ENABLED=false" \
@@ -91,21 +82,57 @@ ENV OPENVPN_USERNAME=**None** \
     "TRANSMISSION_SEED_QUEUE_SIZE=10" \
     "TRANSMISSION_SPEED_LIMIT_DOWN=100" \
     "TRANSMISSION_SPEED_LIMIT_DOWN_ENABLED=false" \
-    "TRANSMISSION_SPEED_LIMIT_UP=100" \
-    "TRANSMISSION_SPEED_LIMIT_UP_ENABLED=false" \
+    "TRANSMISSION_SPEED_LIMIT_UP=50" \
+    "TRANSMISSION_SPEED_LIMIT_UP_ENABLED=true" \
     "TRANSMISSION_START_ADDED_TORRENTS=true" \
     "TRANSMISSION_TRASH_ORIGINAL_TORRENT_FILES=false" \
     "TRANSMISSION_UMASK=2" \
-    "TRANSMISSION_UPLOAD_LIMIT=100" \
-    "TRANSMISSION_UPLOAD_LIMIT_ENABLED=0" \
     "TRANSMISSION_UPLOAD_SLOTS_PER_TORRENT=14" \
     "TRANSMISSION_UTP_ENABLED=true" \
-    "TRANSMISSION_WATCH_DIR=/data/watch" \
+    "TRANSMISSION_WATCH_DIR=/watchdir" \
     "TRANSMISSION_WATCH_DIR_ENABLED=true" \
-    "TRANSMISSION_HOME=/data/transmission-home" \
+    "TRANSMISSION_HOME=/transmissionhome" \
     PUID=\
     PGID=
+# - Set xterm for nano and iftop
+ENV TERM xterm
 
-# Expose port and run
+# Remove previous apt repos
+RUN rm -rf /etc/apt/preferences.d* \
+	&& mkdir /etc/apt/preferences.d \
+	&& rm -rf /etc/apt/sources.list* \
+	&& mkdir /etc/apt/sources.list.d
+	
+# Copy custom bashrc to root (ll aliases)
+COPY root/ /root/
+# Copy apt config for jessie (stable) and stretch (testing) repos
+COPY preferences.d/ /etc/apt/preferences.d/
+COPY sources.list.d/ /etc/apt/sources.list.d/
+
+# Update packages and install software
+RUN apt-get update \
+    && apt-get install -y transmission-cli transmission-common transmission-daemon \
+    && apt-get install -y openvpn curl nano iftop \
+    && apt-get install -y dumb-init -t stretch \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    
+# Create and set user & group for impersonation
+RUN groupmod -g 1000 users \
+    && useradd -u 911 -U -d /config -s /bin/false abc \
+    && usermod -G users abc
+
+# Copy configuration and scripts
+COPY common/ /etc/common/
+COPY openvpn/ /etc/openvpn/
+COPY transmission/ /etc/transmission/
+
+# Fix execution permissions after copy 
+RUN chmod +x /etc/common/*.sh \
+	&& chmod +x /etc/openvpn/*.sh \
+    && chmod +x /etc/transmission/*.sh
+
+# Expose port
 EXPOSE 9091
+
+# Launch OpenVPN with transmission at container start
 CMD ["dumb-init", "/etc/openvpn/start.sh"]

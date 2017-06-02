@@ -17,4 +17,4 @@ fi
 export IMAGE_NAME=$1
 
 # Commands
-docker build -f Dockerfile.armhf -t ${IMAGE_NAME} .
+docker build -t ${IMAGE_NAME} .
