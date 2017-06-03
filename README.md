@@ -4,7 +4,7 @@ Docker image dedicated to ARMv7 processors, hosting a Transmission torrent clien
 This project is fork from an existing project, modified to work on ARMv7 WD My Cloud EX2 Ultra NAS.<br />
 See forked GitHub repository: https://github.com/haugene/docker-transmission-openvpn<br />
 <br />
-This image is part of a Docker images collection, intended to build a full-featured seedbox, and compatible with WD My Cloud EX2 Ultra NAS (Docker v1.7.0).
+This image is part of a Docker images collection, intended to build a full-featured seedbox, and compatible with WD My Cloud EX2 Ultra NAS (Docker v1.7.0):
 
 Docker Image | GitHub repository | Docker Hub repository
 ------------ | ----------------- | -----------------
