@@ -14,6 +14,7 @@ if [ -n "$PUID" ] && [ ! "$(id -u root)" -eq "$PUID" ]; then
     	${TRANSMISSION_HOME} \
     	${TRANSMISSION_HOME}/logs \
         ${TRANSMISSION_DOWNLOAD_DIR} \
+        ${TRANSMISSION_DOWNLOAD_DIR}/${SICKRAGE_LABEL} \
         ${TRANSMISSION_INCOMPLETE_DIR} \
         ${TRANSMISSION_WATCH_DIR}
 fi

@@ -12,8 +12,9 @@ echo "Updating TRANSMISSION_BIND_ADDRESS_IPV4 to the ip of $1 : $4"
 export TRANSMISSION_BIND_ADDRESS_IPV4=$4
 
 echo "Generating transmission settings.json from env variables"
-# Ensure TRANSMISSION_HOME and sub folder logs are created
+# Ensure TRANSMISSION_HOME, sub folder logs and download dir with label are created
 mkdir -p ${TRANSMISSION_HOME}/logs
+mkdir -p ${TRANSMISSION_DOWNLOAD_DIR}/${SICKRAGE_LABEL}
 template /etc/transmission/settings.json.tmpl > ${TRANSMISSION_HOME}/settings.json
 
 if [ ! -e "/dev/random" ]; then

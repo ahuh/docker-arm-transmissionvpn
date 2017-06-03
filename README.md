@@ -64,6 +64,7 @@ You have to create these volume directories with the PUID/PGID user permissions,
 /incompletedir
 /transmissionhome
 ```
+Note: the directory `/downloaddir/SickRage` will be used by the SickRage Docker container in order to move tv shows files after download.
 
 The container will automatically create a `settings.json` file in the transmission home dir.<br />
 * WARNING : the `settings.json` file will be overwritten automatically at each start. Do not modify it: change parameters in `docker-run.sh` and `docker-params.sh` instead, and recreate the container.
