@@ -114,7 +114,7 @@ RUN apt-get update \
     && apt-get install -y transmission-cli transmission-common transmission-daemon \
     && apt-get install -y openvpn curl nano iftop \
     && apt-get install -y dumb-init -t stretch \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
     
 # Create and set user & group for impersonation
 RUN groupmod -g 1000 users \

@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/bash
 
 # Import template function
 . /etc/common/template.sh
@@ -14,7 +14,7 @@ export TRANSMISSION_BIND_ADDRESS_IPV4=$4
 echo "Generating transmission settings.json from env variables"
 # Ensure TRANSMISSION_HOME and sub folder logs are created
 mkdir -p ${TRANSMISSION_HOME}/logs
-template settings.json.tmpl > ${TRANSMISSION_HOME}/settings.json
+template /etc/transmission/settings.json.tmpl > ${TRANSMISSION_HOME}/settings.json
 
 if [ ! -e "/dev/random" ]; then
   # Avoid "Fatal: no entropy gathering module detected" error
@@ -27,7 +27,7 @@ fi
 echo "STARTING TRANSMISSION"
 exec sudo -u ${RUN_AS} /usr/bin/transmission-daemon -g ${TRANSMISSION_HOME} --logfile ${TRANSMISSION_HOME}/logs/transmission.log &
 
-if [ "$OPENVPN_PROVIDER" = "PIA" ]
+if [ "${OPENVPN_PROVIDER}" = "PIA" ]
 then
     echo "CONFIGURING PORT FORWARDING"
     exec /etc/transmission/updatePort.sh &
