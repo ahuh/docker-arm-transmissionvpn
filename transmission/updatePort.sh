@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Source our persisted env variables from container startup
-. /etc/transmission/environment-variables.sh
+. /etc/common/environment-variables.sh
 
 # Settings
 PIA_PASSWD_FILE=/config/openvpn-credentials.txt

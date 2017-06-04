@@ -1,5 +1,5 @@
-# Docker ARM Transmission VPN
-Docker image dedicated to ARMv7 processors, hosting a Transmission torrent client with WebUI while connecting to OpenVPN.<br />
+# Docker ARM TranSquidVpn (Transmission - Squid3 - OpenVPN)
+Docker image dedicated to ARMv7 processors, hosting a Transmission torrent client with WebUI, and Squid3 HTTP proxy, while connecting to OpenVPN.<br />
 <br />
 This project is fork from an existing project, modified to work on ARMv7 WD My Cloud EX2 Ultra NAS.<br />
 See forked GitHub repository: https://github.com/haugene/docker-transmission-openvpn<br />
@@ -8,7 +8,7 @@ This image is part of a Docker images collection, intended to build a full-featu
 
 Docker Image | GitHub repository | Docker Hub repository
 ------------ | ----------------- | -----------------
-Docker image (ARMv7) hosting a Transmission torrent client with WebUI while connecting to OpenVPN | https://github.com/ahuh/docker-arm-transmissionvpn | https://hub.docker.com/r/ahuh/arm-transmissionvpn
+Docker image (ARMv7) hosting a Transmission torrent client with WebUI, and Squid3 HTTP proxy, while connecting to OpenVPN | https://github.com/ahuh/docker-arm-transmissionvpn | https://hub.docker.com/r/ahuh/arm-transmissionvpn
 Docker image (ARMv7) hosting a qBittorrent client with WebUI while connecting to OpenVPN | https://github.com/ahuh/docker-arm-qbittorrentvpn | https://hub.docker.com/r/ahuh/arm-qbittorrentvpn
 Docker image (ARMv7) hosting SubZero with MKVMerge (subtitle autodownloader for TV shows) | https://github.com/ahuh/docker-arm-subzero | https://hub.docker.com/r/ahuh/arm-subzero
 Docker image (ARMv7) hosting a SickRage server with WebUI | https://github.com/ahuh/docker-arm-sickrage | https://hub.docker.com/r/ahuh/arm-sickrage
@@ -31,12 +31,16 @@ The container will run impersonated as this user, in order to have read/write ac
 ### Run container in background
 ```
 $ docker run --name transmission --restart=always -d \
-		-p <webui port>:9091 --cap-add=NET_ADMIN \
+		-p <transmission webui port>:9091 \
+		-p <squid3 http proxy port>:3128 \		 
+		--cap-add=NET_ADMIN \
 		--device=<tunnel network interface> \
 		-v <path to torrent dir to scan>:/watchdir \
 		-v <path to completed dir>:/downloaddir \
 		-v <path to incompleted dir>:/incompletedir \
 		-v <path to transmission home dir>:/transmissionhome \
+		-v <path to squid3 config dir>:/squidconfig \
+		-v <path to squid3 logs dir>:/var/log/squid3 \
 		-v /etc/localtime:/etc/localtime:ro \
 		-e "OPENVPN_PROVIDER=<openvpn provider>" \
 		-e "OPENVPN_CONFIG=<openvpn configuration>" \
@@ -63,12 +67,18 @@ You have to create these volume directories with the PUID/PGID user permissions,
 /downloaddir
 /incompletedir
 /transmissionhome
+/squidconfig
 ```
 Note: the directory `/downloaddir/SickRage` will be used by the SickRage Docker container in order to move tv shows files after download.
 
 The container will automatically create a `settings.json` file in the transmission home dir.<br />
 * WARNING : the `settings.json` file will be overwritten automatically at each start. Do not modify it: change parameters in `docker-run.sh` and `docker-params.sh` instead, and recreate the container.
 * With PIA VPN, the transmission connection port will be automatically changed at launch if port forwarding is available.
+
+The container will automatically create a `squid.conf` file in the squid3 config dir.<br />
+* WARNING : the `squid.conf` file will be overwritten automatically at each start. Do not modify it: change parameters in `docker-run.sh` and `docker-params.sh` instead, and recreate the container.
+* The parameter `LOCAL_NETWORK` is required by squid3 (source network allowed for HTTP proxy).
+* To connect to the HTTP proxy from the local network : just point to the Docker host server, and to the port mapped to Docker container port 3128.
 
 ## HOW-TOs
 

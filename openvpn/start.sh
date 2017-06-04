@@ -45,11 +45,11 @@ fi
 echo $TRANSMISSION_RPC_USERNAME > /config/transmission-credentials.txt
 echo $TRANSMISSION_RPC_PASSWORD >> /config/transmission-credentials.txt
 
-# Persist transmission settings for use by transmission-daemon
-template /etc/transmission/environment-variables.sh.tmpl > /etc/transmission/environment-variables.sh
-chmod +x /etc/transmission/environment-variables.sh
+# Persist env settings for use by transmission-daemon and squid3
+template /etc/common/environment-variables.sh.tmpl > /etc/common/environment-variables.sh
+chmod +x /etc/common/environment-variables.sh
 
-TRANSMISSION_CONTROL_OPTS="--script-security 2 --up /etc/transmission/start.sh --down /etc/transmission/stop.sh"
+OPENVPN_CONTROL_OPTS="--script-security 2 --up /etc/openvpn/openvpn_up.sh --down /etc/openvpn/openvpn_down.sh"
 
 if [ -n "${LOCAL_NETWORK-}" ]; then
   eval $(/sbin/ip r l m 0.0.0.0 | awk '{if($5!="tun0"){print "GW="$3"\nINT="$5; exit}}')
@@ -59,4 +59,7 @@ if [ -n "${LOCAL_NETWORK-}" ]; then
   fi
 fi
 
-exec openvpn $TRANSMISSION_CONTROL_OPTS $OPENVPN_OPTS --config "$OPENVPN_CONFIG"
+# Start Squid3
+. /etc/squid3/start.sh
+
+exec openvpn $OPENVPN_CONTROL_OPTS $OPENVPN_OPTS --config "$OPENVPN_CONFIG"

@@ -4,7 +4,7 @@
 . /etc/common/template.sh
 
 # Source our persisted env variables from container startup
-. /etc/transmission/environment-variables.sh
+. /etc/common/environment-variables.sh
 
 # This script will be called with tun/tap device name as parameter 1, and local IP as parameter 4
 # See https://openvpn.net/index.php/open-source/documentation/manuals/65-openvpn-20x-manpage.html (--up cmd)

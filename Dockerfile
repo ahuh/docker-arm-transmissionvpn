@@ -14,9 +14,14 @@ VOLUME /downloaddir
 # Volume incompletedir: use it in transmission configuration for incomplete dir
 # WARNING: must have read/write accept for execution user (PUID/PGID)
 VOLUME /incompletedir
-# Volume config: transmission home directory (generated at first start if needed)
+# Volume transmissionhome: transmission home directory (generated at first start if needed)
 # WARNING: must have read/write accept for execution user (PUID/PGID)
 VOLUME /transmissionhome
+# Volume squidconfig: squid3 config directory (generated at first start if needed)
+# WARNING: must have read/write accept for execution user (PUID/PGID)
+VOLUME /squidconfig
+# Volume squidlogs: squid3 log directory (generated at first start)
+VOLUME /var/log/squid3
 # Volume userhome: home directory for execution user
 VOLUME /config
 
@@ -113,6 +118,7 @@ COPY sources.list.d/ /etc/apt/sources.list.d/
 # Update packages and install software
 RUN apt-get update \
     && apt-get install -y transmission-cli transmission-common transmission-daemon \
+    && apt-get install -y squid3 \
     && apt-get install -y openvpn curl nano iftop \
     && apt-get install -y dumb-init -t stretch \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -126,14 +132,16 @@ RUN groupmod -g 1000 users \
 COPY common/ /etc/common/
 COPY openvpn/ /etc/openvpn/
 COPY transmission/ /etc/transmission/
+COPY squid3/ /etc/squid3/
 
 # Fix execution permissions after copy 
 RUN chmod +x /etc/common/*.sh \
 	&& chmod +x /etc/openvpn/*.sh \
-    && chmod +x /etc/transmission/*.sh
+    && chmod +x /etc/transmission/*.sh \
+    && chmod +x /etc/squid3/*.sh
 
 # Expose port
-EXPOSE 9091
+EXPOSE 9091 3128
 
 # Launch OpenVPN with transmission at container start
 CMD ["dumb-init", "/etc/openvpn/start.sh"]
