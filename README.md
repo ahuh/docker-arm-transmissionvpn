@@ -31,6 +31,7 @@ The container will run impersonated as this user, in order to have read/write ac
 ### Run container in background
 ```
 $ docker run --name transmission --restart=always -d \
+		--dns=<ip of dns #1> --dns=<ip of dns #2> \
 		-p <transmission webui port>:9091 \
 		-p <squid3 http proxy port>:3128 \		 
 		--cap-add=NET_ADMIN \
