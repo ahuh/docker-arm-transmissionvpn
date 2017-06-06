@@ -31,6 +31,7 @@ The container will run impersonated as this user, in order to have read/write ac
 ### Run container in background
 ```
 $ docker run --name transmission --restart=always -d \
+		--add-host=dockerhost:<docker host IP> \
 		--dns=<ip of dns #1> --dns=<ip of dns #2> \
 		-p <transmission webui port>:9091 \
 		-p <squid3 http proxy port>:3128 \		 
@@ -49,6 +50,7 @@ $ docker run --name transmission --restart=always -d \
 		-e "OPENVPN_PASSWORD=<openvpn password> \
 		-e "OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60" \
 		-e "LOCAL_NETWORK=<local network ip/mask>" \
+		-e "DOCKER_NETWORK=<docker network ip/mask>" \
 		-e "PUID=<user uid>" \
 		-e "PGID=<user gid>" \
 		ahuh/arm-transmissionvpn
@@ -59,7 +61,7 @@ $ ./docker-run.sh transmission ahuh/arm-transmissionvpn
 ```
 (set parameters in `docker-run.sh` before launch, and generate a `docker-params.sh` to store secret OpenVPN parameters, as described in `docker-run.sh`)
 
-### Configure Transmission
+### Configure Transmission and Squid3
 The container will use volumes directories to store torrent files, downloaded files, and configuration files.<br />
 <br />
 You have to create these volume directories with the PUID/PGID user permissions, before launching the container:
@@ -78,8 +80,8 @@ The container will automatically create a `settings.json` file in the transmissi
 
 The container will automatically create a `squid.conf` file in the squid3 config dir.<br />
 * WARNING : the `squid.conf` file will be overwritten automatically at each start. Do not modify it: change parameters in `docker-run.sh` and `docker-params.sh` instead, and recreate the container.
-* The parameter `LOCAL_NETWORK` is required by squid3 (source network allowed for HTTP proxy).
-* To connect to the HTTP proxy from the local network : just point to the Docker host server, and to the port mapped to Docker container port 3128.
+* The parameters `LOCAL_NETWORK` and `DOCKER_NETWORK` are required by squid3 (source networks allowed for HTTP proxy).
+* To connect to the HTTP proxy from the local network or from other Docker containers : just point to the Docker host server, and to the port mapped to 3128.
 
 ## HOW-TOs
 
