@@ -13,7 +13,7 @@ callRun(){
 	local DOCKER_DIR_PATH=$2
 	if [[ -f "${DOCKER_DIR_PATH}/docker-run.sh" ]]; then
 		echo "Run ${DOCKER_NAME}"
-		( ${DOCKER_DIR_PATH}/docker-run.sh )
+		( cd ${DOCKER_DIR_PATH} ; ./docker-run.sh )
 	fi
 }
 
