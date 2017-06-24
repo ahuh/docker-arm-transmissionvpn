@@ -1,5 +1,6 @@
 # Docker ARM TranSquidVpn (Transmission - Squid3 - OpenVPN)
 Docker image dedicated to ARMv7 processors, hosting a Transmission torrent client with WebUI, and Squid3 HTTP proxy, while connecting to OpenVPN.<br />
+Optionaly, the Transmission Web Control WebUI may be installed to replace the standard Transmission WebUI.<br />
 <br />
 This project is fork from an existing project, modified to work on ARMv7 WD My Cloud EX2 Ultra NAS.<br />
 See forked GitHub repository: https://github.com/haugene/docker-transmission-openvpn<br />
@@ -44,6 +45,7 @@ $ docker run --name transmission --restart=always -d \
 		-v <path to squid3 config dir>:/squidconfig \
 		-v <path to squid3 logs dir>:/var/log/squid3 \
 		-v /etc/localtime:/etc/localtime:ro \
+		-e "INSTALL_TRANSMISSION_WEB_CONTROL=<download and install Transmission Web Control at first start [true/false]>"
 		-e "OPENVPN_PROVIDER=<openvpn provider>" \
 		-e "OPENVPN_CONFIG=<openvpn configuration>" \
 		-e "OPENVPN_USERNAME=<openvpn user name>" \

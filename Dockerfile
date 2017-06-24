@@ -27,7 +27,8 @@ VOLUME /config
 
 # Set environment variables
 # - Set OpenVPN IDs (must be overloaded), all Transmission parameters, and execution user (PUID/PGID)
-ENV OPENVPN_USERNAME=**None** \
+ENV ENABLE_TRANSMISSION_WEB_CONTROL=\
+	OPENVPN_USERNAME=**None** \
     OPENVPN_PASSWORD=**None** \
     OPENVPN_PROVIDER=**None** \
     "SICKRAGE_LABEL=SickRage" \
@@ -119,7 +120,7 @@ COPY sources.list.d/ /etc/apt/sources.list.d/
 RUN apt-get update \
     && apt-get install -y transmission-cli transmission-common transmission-daemon \
     && apt-get install -y squid3 \
-    && apt-get install -y openvpn curl nano iftop \
+    && apt-get install -y openvpn curl wget nano iftop \
     && apt-get install -y dumb-init -t stretch \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
     

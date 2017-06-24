@@ -34,6 +34,7 @@ export V_SQUID_LOGS=/shares/P2P/tools/squid/logs
 export P_TRANSMISSION_PORT=9091
 export P_SQUID_PORT=3128
 
+export E_INSTALL_TRANSMISSION_WEB_CONTROL=true
 export E_LOCAL_NETWORK=192.168.0.0/24
 export E_DOCKER_NETWORK=$(ip route | grep docker | awk '{print $1}')
 export E_PUID=500
@@ -104,4 +105,4 @@ fi
 # Custom commands
 
 echo "Run container: ${CONTAINER_NAME}"
-docker run --name ${CONTAINER_NAME} --restart=always --add-host=dockerhost:${DOCKERHOST} --dns=${DNS_1} --dns=${DNS_2} -d -p ${P_TRANSMISSION_PORT}:9091 -p ${P_SQUID_PORT}:3128 --cap-add=NET_ADMIN --device=${DEVICE} -v ${V_WATCH_DIR}:/watchdir -v ${V_DOWNLOAD_DIR}:/downloaddir -v ${V_INCOMPLETE_DIR}:/incompletedir -v ${V_TRANSMISSION_HOME}:/transmissionhome -v ${V_SQUID_CONFIG}:/squidconfig -v ${V_SQUID_LOGS}:/var/log/squid3 -v /etc/localtime:/etc/localtime:ro -e "OPENVPN_PROVIDER=${E_OPENVPN_PROVIDER}" -e "OPENVPN_CONFIG=${E_OPENVPN_CONFIG}" -e "OPENVPN_USERNAME=${E_OPENVPN_USERNAME}" -e "OPENVPN_PASSWORD=${E_OPENVPN_PASSWORD}" -e "OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60" -e "LOCAL_NETWORK=${E_LOCAL_NETWORK}" -e "DOCKER_NETWORK=${E_DOCKER_NETWORK}" -e "PUID=${E_PUID}" -e "PGID=${E_PGID}" ${IMAGE_NAME}
+docker run --name ${CONTAINER_NAME} --restart=always --add-host=dockerhost:${DOCKERHOST} --dns=${DNS_1} --dns=${DNS_2} -d -p ${P_TRANSMISSION_PORT}:9091 -p ${P_SQUID_PORT}:3128 --cap-add=NET_ADMIN --device=${DEVICE} -v ${V_WATCH_DIR}:/watchdir -v ${V_DOWNLOAD_DIR}:/downloaddir -v ${V_INCOMPLETE_DIR}:/incompletedir -v ${V_TRANSMISSION_HOME}:/transmissionhome -v ${V_SQUID_CONFIG}:/squidconfig -v ${V_SQUID_LOGS}:/var/log/squid3 -v /etc/localtime:/etc/localtime:ro -e "INSTALL_TRANSMISSION_WEB_CONTROL=${E_INSTALL_TRANSMISSION_WEB_CONTROL}" -e "OPENVPN_PROVIDER=${E_OPENVPN_PROVIDER}" -e "OPENVPN_CONFIG=${E_OPENVPN_CONFIG}" -e "OPENVPN_USERNAME=${E_OPENVPN_USERNAME}" -e "OPENVPN_PASSWORD=${E_OPENVPN_PASSWORD}" -e "OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60" -e "LOCAL_NETWORK=${E_LOCAL_NETWORK}" -e "DOCKER_NETWORK=${E_DOCKER_NETWORK}" -e "PUID=${E_PUID}" -e "PGID=${E_PGID}" ${IMAGE_NAME}
