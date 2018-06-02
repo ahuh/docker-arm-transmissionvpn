@@ -8,9 +8,9 @@ if [ "${INSTALL_TRANSMISSION_WEB_CONTROL}" = true ] && [ ! -e "${TWC_INSTALLED_F
 	CURRENTDIR=${PWD}
 	
 	cd /etc/transmission/
-	wget https://github.com/ronggang/transmission-web-control/raw/master/release/tr-control-easy-install-en.sh
-	chmod +x tr-control-easy-install-en.sh
-	. ./tr-control-easy-install-en.sh
+	wget https://github.com/ronggang/transmission-web-control/raw/master/release/install-tr-control.sh --no-check-certificate	
+	chmod +x install-tr-control.sh	
+	. ./install-tr-control.sh auto
 	
 	cd ${CURRENTDIR}	
 	touch ${TWC_INSTALLED_FILE}
