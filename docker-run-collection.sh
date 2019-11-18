@@ -22,14 +22,8 @@ callRun(){
 # 1) transquidvpn
 callRun transquidvpn .
 
-# 2) qbittorrentvpn
-#callRun qbittorrentvpn ../docker-arm-qbittorrentvpn
+# 2) medusa
+callRun medusa ../docker-arm-medusa
 
-# 3) subzero
-callRun subzero ../docker-arm-subzero
-
-# 4) sickrage
-callRun sickrage ../docker-arm-sickrage
-
-# 5) nginx
+# 3) nginx
 callRun nginx ../docker-arm-nginx
